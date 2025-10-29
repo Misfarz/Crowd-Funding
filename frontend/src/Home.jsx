@@ -30,9 +30,7 @@ const Home = () => {
       }
     };
 
-    const timer = setInterval (fetchData,10000)
-
-    return () => clearInterval(timer)
+    fetchData()
 
   }, []);
 
@@ -98,7 +96,7 @@ const Home = () => {
             if (verifyRes.data.success) { 
               const {token} = verifyRes.data
               sessionStorage.setItem("paymentToken",token)
-              navigate('/payment-sucess')
+              navigate('/payment-success')
               setCurrentAmount((prev) => prev + parseInt(amount));
               handleCloseModal();
             } else {

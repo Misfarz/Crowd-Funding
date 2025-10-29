@@ -1,7 +1,7 @@
 import razorpay from "../config/razorpay.js";
 import crypto from "crypto";
 import Donation from '../models/Donation.js'
-import token from "../utils/generateToken.js";
+import jwt from 'jsonwebtoken'
 
 
 export const createOrder = async (req, res) => {
@@ -58,6 +58,12 @@ export const verifyPayment = async (req, res) => {
         paymentId: razorpay_payment_id,
         orderId: razorpay_order_id,
       });
+
+     const token = jwt.sign(
+      { status: "success", name, email, amount },
+      process.env.JWT_SECRET,
+      { expiresIn: "2m" }
+    );
 
       return res
         .status(200)
