@@ -1,16 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { XCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 function Failed() {
-     const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  // 🎉 Confetti animation
-  React.useEffect(() => {
-    confetti({
-      particleCount: 150,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-  }, []);
+    useEffect(() => {
+      const token = sessionStorage.getItem("paymentToken");
+      if (!token) navigate("/");
+    }, []);
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center px-6">
@@ -26,17 +24,17 @@ function Failed() {
 
       {/* Content */}
       <div className="relative z-10 text-center max-w-md bg-gray-900/70 backdrop-blur-md border border-gray-800 rounded-2xl p-10 shadow-lg space-y-6">
-        <CheckCircle className="w-20 h-20 text-green-500 mx-auto animate-bounce" />
-        <h1 className="text-4xl font-semibold">Payment Successful 🎉</h1>
+        <XCircle className="w-20 h-20 text-red-500 mx-auto animate-pulse" />
+        <h1 className="text-4xl font-semibold text-white">Payment Failed</h1>
         <p className="text-gray-400 text-lg leading-relaxed">
-          Your support just fueled the dream closer to reality.  
-          Thank you for believing in this journey!
+          Something went wrong while processing your payment.  
+          Don’t worry — you can try again anytime!
         </p>
         <button
           onClick={() => navigate("/")}
-          className="bg-gradient-to-r from-red-600 to-red-800 px-10 py-3 rounded-lg font-semibold tracking-wide border border-red-700 hover:from-red-700 hover:to-red-900 transition-all duration-300"
+          className="bg-gradient-to-r from-gray-700 to-gray-900 px-10 py-3 rounded-lg font-semibold tracking-wide border border-gray-700 hover:from-gray-800 hover:to-gray-950 transition-all duration-300"
         >
-          Back to Home
+          Try Again
         </button>
       </div>
     </div>

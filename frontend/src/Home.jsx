@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import cover from './assets/cover.png';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const [currentAmount, setCurrentAmount] = useState(2080000);
@@ -13,7 +14,7 @@ const Home = () => {
     amount: '',
   });
   const [supporters, setSupporters] = useState([])
-
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -28,6 +29,10 @@ const Home = () => {
         console.error("Error fetching donations:", error);
       }
     };
+
+    const timer = setInterval (fetchData,10000)
+
+    return () => clearInterval(timer)
 
   }, []);
 
@@ -90,12 +95,14 @@ const Home = () => {
               amount,
             });
 
-            if (verifyRes.data.success) {
-              alert('🎉 Payment Successful! Thank you for your support.');
+            if (verifyRes.data.success) { 
+              const {token} = verifyRes.data
+              sessionStorage.setItem("paymentToken",token)
+              navigate('/payment-sucess')
               setCurrentAmount((prev) => prev + parseInt(amount));
               handleCloseModal();
             } else {
-              alert('❌ Payment verification failed.');
+               navigate('/payment-failed')
             }
           } catch (error) {
             console.error(error);

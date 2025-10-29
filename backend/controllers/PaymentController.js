@@ -1,6 +1,7 @@
 import razorpay from "../config/razorpay.js";
 import crypto from "crypto";
 import Donation from '../models/Donation.js'
+import token from "../utils/generateToken.js";
 
 
 export const createOrder = async (req, res) => {
@@ -60,7 +61,7 @@ export const verifyPayment = async (req, res) => {
 
       return res
         .status(200)
-        .json({ success: true, message: "Payment verified successfully!" });
+        .json({ success: true, message: "Payment verified successfully!" ,token});
     } else {
       return res
         .status(400)
