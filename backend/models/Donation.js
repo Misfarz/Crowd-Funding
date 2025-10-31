@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 
 const donationSchema = new mongoose.Schema({
   name: { type: String, default: "Anonymous" },
-  email: String,
+  email: String ,
   amount: Number,
+  message : String,
   paymentId: String,
   orderId: String,
   createdAt: { type: Date, default: Date.now },

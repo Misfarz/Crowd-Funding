@@ -4,13 +4,14 @@ import cover from './assets/cover.png';
 import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
-  const [currentAmount, setCurrentAmount] = useState(2080000);
-  const [targetAmount] = useState(10000000);
+  const [currentAmount, setCurrentAmount] = useState(0);
+  const [targetAmount] = useState(100000);
   const [donationAmount, setDonationAmount] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [donationData, setDonationData] = useState({
     name: '',
     email: '',
+    message: '',
     amount: '',
   });
   const [supporters, setSupporters] = useState([])
@@ -30,7 +31,8 @@ const Home = () => {
       }
     };
 
-    fetchData()
+    const loader = setInterval(fetchData,5000)
+    return () => clearInterval(loader)
 
   }, []);
 
@@ -61,12 +63,19 @@ const Home = () => {
   // Razorpay Payment Integration using Axios
   // ------------------------
   const handlePayment = async () => {
-    const { name, email, amount } = donationData;
+    const { name, email, amount, message } = donationData;
 
     if (!amount || amount <= 0) {
       alert('Please enter a valid donation amount.');
       return;
     }
+
+    const nameRegex = /^[A-Za-z]+(?:[ .-][A-Za-z]+)*$/;
+
+if (!name || name.trim().length < 3 || !nameRegex.test(name.trim())) {
+  alert("Please enter a valid name (min 3 letters, alphabets only).");
+  return;
+}
 
     try {
       // 1️⃣ Create Razorpay order via backend
@@ -91,6 +100,7 @@ const Home = () => {
               name,
               email,
               amount,
+              message
             });
 
             if (verifyRes.data.success) { 
@@ -124,6 +134,15 @@ const Home = () => {
     }
   };
 
+function getInitials(name) {
+  return name
+    .split(" ")
+    .map(n => n[0])
+    .join("")
+    .toUpperCase();
+}
+
+
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Background */}
@@ -133,7 +152,7 @@ const Home = () => {
           alt="Dream Porsche"
           className="w-full h-full object-cover opacity-50"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/60 to-black/95"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/10"></div>
       </div>
 
       {/* Main */}
@@ -144,7 +163,8 @@ const Home = () => {
             A Dream 15 Years in the Making
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            From childhood dreams to today’s pursuit — every small contribution fuels this journey toward the ultimate driving machine.
+            From childhood dreams to today’s pursuit — every small contribution
+            fuels this journey toward the ultimate driving machine.
           </p>
         </section>
 
@@ -169,7 +189,7 @@ const Home = () => {
 
         {/* STORY */}
         <section className="text-center space-y-4 max-w-2xl">
-          <div className="flex justify-center space-x-8 text-lg text-gray-400 uppercase tracking-widest">
+          <div className="flex justify-center space-x-8 text-xs text-gray-400 uppercase tracking-widest">
             <span>15 Years</span>
             <span>•</span>
             <span>1 Dream</span>
@@ -177,7 +197,8 @@ const Home = () => {
             <span>Your Support</span>
           </div>
           <p className="text-gray-400 leading-relaxed text-lg">
-            Together, let’s turn an ordinary road into the road that leads to a dream. Every rupee, every supporter, every moment matters.
+            Together, let’s turn an ordinary road into the road that leads to a
+            dream. Every rupee, every supporter, every moment matters.
           </p>
         </section>
 
@@ -189,14 +210,21 @@ const Home = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <input
-              type="number"
-              value={donationAmount}
-              onChange={(e) => setDonationAmount(e.target.value)}
-              placeholder="Enter amount in ₹"
-              min="1"
-              className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-red-600 placeholder-gray-500"
-            />
+           <input
+  type="number"
+  value={donationAmount}
+  onChange={(e) => setDonationAmount(e.target.value)}
+  placeholder="Enter amount in ₹"
+  min="1"
+  className="
+    flex-1 bg-gray-800 border border-gray-700 rounded-lg px-5 py-4 
+    focus:outline-none focus:ring-2 focus:ring-red-600 placeholder-gray-500
+    
+    bg-gradient-to-r from-[#FFD700] via-[#E5C100] to-[#B8860B]
+    text-transparent bg-clip-text font-bold
+  "
+/>
+
             <button
               onClick={handleOpenModal}
               disabled={!donationAmount || donationAmount <= 0}
@@ -208,16 +236,38 @@ const Home = () => {
         </section>
 
         {/* SUPPORTERS */}
-        <section className="w-full max-w-3xl text-center space-y-6">
-          <h4 className="text-2xl font-medium text-gray-200">Recent Supporters</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <section className="w-full max-w-4xl mx-auto text-center space-y-8">
+          <h4 className="text-3xl font-semibold text-gray-100 tracking-wide">
+            Recent Supporters
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {supporters.map((supporter, i) => (
               <div
                 key={i}
-                className="bg-gray-900/70 backdrop-blur-sm border border-gray-800 rounded-xl px-6 py-4 shadow-lg flex flex-col items-center hover:bg-gray-800/70 transition-all"
+                className="group bg-gray-900/60 backdrop-blur-md border border-gray-800 rounded-2xl p-5 shadow-xl 
+        hover:border-gray-700 hover:bg-gray-800/70 transition-all duration-300 flex flex-col items-center"
               >
-                <span className="text-gray-200 font-medium">{supporter.name}</span>
-                <span className="text-red-400 font-semibold text-lg">+₹{supporter.amount}</span>
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold bg-gradient-to-r from-red-600 to-red-800"
+                >
+                  {getInitials(supporter.name)}
+                </div>
+
+                <p className="text-gray-100 font-semibold text-lg">
+                  {supporter.name}
+                </p>
+
+               <p className="bg-gradient-to-r from-[#FFD700] via-[#E5C100] to-[#B8860B] text-transparent bg-clip-text font-bold text-xl mt-1">
+  ₹{supporter.amount.toLocaleString()}
+</p>
+
+
+                {supporter.message && (
+                  <p className="text-gray-300 text-sm mt-2 italic leading-relaxed">
+                    "{supporter.message}"
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -242,7 +292,7 @@ const Home = () => {
               <input
                 type="email"
                 name="email"
-                placeholder="Your Email"
+                placeholder="Your Email (optional)"
                 value={donationData.email}
                 onChange={handleChange}
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500"
@@ -252,6 +302,15 @@ const Home = () => {
                 name="amount"
                 placeholder="Enter Amount (₹)"
                 value={donationData.amount}
+                onChange={handleChange}
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500"
+              />
+
+              <input
+                type="text"
+                name="message"
+                placeholder="Description...(optional)"
+                value={donationData.message}
                 onChange={handleChange}
                 className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500"
               />

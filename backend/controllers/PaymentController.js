@@ -37,6 +37,7 @@ export const verifyPayment = async (req, res) => {
       name,
       email,
       amount,
+      message
     } = req.body;
 
     // Create the signature body
@@ -54,6 +55,7 @@ export const verifyPayment = async (req, res) => {
       await Donation.create({
         name: name ,
         email,
+        message,
         amount: Number(amount),
         paymentId: razorpay_payment_id,
         orderId: razorpay_order_id,
